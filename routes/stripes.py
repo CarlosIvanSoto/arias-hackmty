@@ -1,19 +1,18 @@
-from flask import Flask, jsonify, render_template, url_for, request, abort
-from routes.www import app as www_bp
-from routes.cv2 import app as cv2_bp
-import stripe
-##from routes.stripes import appStripe as stripe_bp
+from flask import Blueprint, render_template, url_for, request, abort
+import stripe 
+from ..app import app
 
-app = Flask(__name__)
-#TEST CONECTION
+
+appStripe = Blueprint('routes-stripe', __name__)
+
 
 app.config['STRIPE_PUBLIC_KEY'] = 'pk_test_51LlfNGGuGVj1FqA7CozX49ZPxH2D0wtcqot4eKakjXMfSeUjHfkCbcy46RS3lz3KGEHu6yCZw6GUuwBWFD7h5yhm00MxmoX9ht'
 app.config['STRIPE_SECRET_KEY'] = 'sk_test_51LlfNGGuGVj1FqA7hahRvMxeD4tdvTY5XmodFXqKJx48gotl0petE9pd3AIR4BbCAG0ExlsKN8yQXe8UxLHbcWXT000WJnDsB6'
 
 stripe.api_key = app.config['STRIPE_SECRET_KEY']
 
-@app.route('/indexst')
-def indexst():
+@appStripe.route('/stripe')
+def stripe():
     '''
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -32,7 +31,7 @@ def indexst():
         #checkout_public_key=app.config['STRIPE_PUBLIC_KEY']
     )
 
-@app.route('/stripe_pay')
+@appStripe.route('/stripe_pay')
 def stripe_pay():
     session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -42,18 +41,18 @@ def stripe_pay():
         }],
         mode='payment',
         success_url=url_for('thanks', _external=True) + '?session_id={CHECKOUT_SESSION_ID}',
-        cancel_url=url_for('indexst', _external=True),
+        cancel_url=url_for('stripe', _external=True),
     )
     return {
         'checkout_session_id': session['id'], 
         'checkout_public_key': app.config['STRIPE_PUBLIC_KEY']
     }
 
-@app.route('/thanks')
+@appStripe.route('/thanks')
 def thanks():
     return render_template('thanks.html')
 
-@app.route('/stripe_webhook', methods=['POST'])
+@appStripe.route('/stripe_webhook', methods=['POST'])
 def stripe_webhook():
     print('WEBHOOK CALLED')
 
@@ -84,16 +83,4 @@ def stripe_webhook():
         print(session)
         line_items = stripe.checkout.Session.list_line_items(session['id'], limit=1)
         print(line_items['data'][0]['description'])
-
     return {}
-# Aquí empiezan las rutas
-#default check rest api route
-@app.route('/ping')
-def ping():
-    return jsonify({"message": "Pong!"})
-#add routes tasks
-app.register_blueprint(www_bp)
-app.register_blueprint(cv2_bp)
-
-if __name__ == "__main__":
-    app.run(debug=True)

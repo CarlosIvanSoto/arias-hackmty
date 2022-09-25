@@ -257,6 +257,8 @@ def handd():
             cv2.rectangle(frame, (340, 10), (390, 60), BLUE, thickness[4])
             cv2.putText(frame, "Menique", (340, 80), 1, 1, (255, 255, 255), 2)
 
+              
+            
             cv2.imshow('frame',frame)
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
@@ -273,12 +275,11 @@ def emotionImage(emotion):
 
 
 def avatar():
-    """
+    
     method = 'LBPH'
     if method == 'EigenFaces': emotion_recognizer = cv2.face.EigenFaceRecognizer_create()
     if method == 'FisherFaces': emotion_recognizer = cv2.face.FisherFaceRecognizer_create()
-    if method == 'LBPH': """
-    emotion_recognizer = cv2.face.LBPHFaceRecognizer_create()
+    if method == 'LBPH': emotion_recognizer = cv2.face.LBPHFaceRecognizer_create()
     emotion_recognizer.read('modeloLBPH.xml')
     # --------------------------------------------------------------------------------
     dataPath = 'data' #Cambia a la ruta donde hayas almacenado Data
@@ -297,7 +298,7 @@ def avatar():
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         auxFrame = gray.copy()
 
-        #nFrame = cv2.hconcat([frame, np.zeros((480 ,300,3),dtype=np.uint8)])
+        nFrame = cv2.hconcat([frame, np.zeros((480 ,300,3),dtype=np.uint8)])
 
         faces = faceClassif.detectMultiScale(gray,1.3,5)
 
@@ -308,17 +309,20 @@ def avatar():
 
             cv2.putText(frame,'{}'.format(result),(x,y-5),1,1.3,(255,255,0),1,cv2.LINE_AA)
             # LBPHFace
-            if result[1] < 60:
-                cv2.putText(frame,'{}'.format(imagePaths[result[0]]),(x,y-25),2,1.1,(0,255,0),1,cv2.LINE_AA)
-                cv2.rectangle(frame, (x,y),(x+w,y+h),(0,255,0),2)
-                image = emotionImage(imagePaths[result[0]])
-                nframe = cv2.hconcat([frame,image])
-            else:
-                cv2.putText(frame,'No identificado',(x,y-20),2,0.8,(0,0,255),1,cv2.LINE_AA)
-                cv2.rectangle(frame, (x,y),(x+w,y+h),(0,0,255),2)
-                nframe = cv2.hconcat([frame,np.zeros((480,300,3),dtype=np.uint8)])
-        #cv2.imshow('nframe', nframe)
-        
+            if method == 'LBPH':
+                if result[1] < 60:
+                    cv2.putText(frame,'{}'.format(imagePaths[result[0]]),(x,y-25),2,1.1,(0,255,0),1,cv2.LINE_AA)
+                    cv2.rectangle(frame, (x,y),(x+w,y+h),(0,255,0),2)
+                    image = emotionImage(imagePaths[result[0]])
+                    nframe = cv2.hconcat([frame,image])
+                else:
+                    cv2.putText(frame,'No identificado',(x,y-20),2,0.8,(0,0,255),1,cv2.LINE_AA)
+                    cv2.rectangle(frame, (x,y),(x+w,y+h),(0,0,255),2)
+                    image = emotionImage(imagePaths[0])
+                    nframe = cv2.hconcat([frame,image])
+                    #nframe = cv2.hconcat([frame,np.zeros((480,300,3),dtype=np.uint8)])
+                
+        cv2.imshow('nframe', nframe)
         ret, buffer = cv2.imencode('.jpg', nframe)
         if ret:
             nframe = buffer.tobytes()

@@ -2,6 +2,9 @@ from flask import Blueprint, render_template
 
 app = Blueprint('routes-www', __name__)
 
+@app.route('/gestos') # selector de avatar
+def gestos():
+    return render_template('gestos.html')
 
 @app.route('/avatar') # selector de avatar
 def avatar():
