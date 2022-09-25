@@ -2,8 +2,16 @@ from flask import Blueprint, render_template
 
 app = Blueprint('routes-www', __name__)
 
-#add new task
-@app.route('/login')
+
+@app.route('/avatar') # selector de avatar
+def avatar():
+    return render_template('avatares.html')
+
+@app.route('/register') # detector  
+def register():
+    return render_template('register.html')
+
+@app.route('/login') # puntitos
 def login():
     return render_template('login.html')
 

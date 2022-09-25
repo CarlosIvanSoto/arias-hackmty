@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, render_template, Response
 from routes.www import app as www_bp
 from routes.cv2 import app as cv2_bp
+from routes.handDetect import app as hand_bp
 import cv2
 import mediapipe as mp
 
